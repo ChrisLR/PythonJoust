@@ -1,10 +1,21 @@
-from actors.base import Rider
+import random
+
 import pygame
 
+from actors import listing
+from actors.base import Rider
 
+
+@listing.register
 class Player(Rider):
-    def __init__(self, game, x, y, bird_images, spawn_images, player_unmounted_images):
-        super().__init__(game, x, y, bird_images, spawn_images, player_unmounted_images)
+    name = "Player"
+
+    def __init__(self, game, x, y):
+        sprite_loader = game.sprite_loader
+        bird_images = sprite_loader.get_sliced_sprites(60, 60, "playerMounted.png")
+        spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
+        unmounted_images = sprite_loader.get_sliced_sprites(60, 60, "playerUnmounted.png")
+        super().__init__(game, x, y, bird_images, spawn_images, unmounted_images)
         self.frameNum = 2
         self.image = self.images[self.frameNum]
         self.rect = self.image.get_rect()
@@ -213,8 +224,8 @@ class Player(Rider):
         self.x = 415
         self.y = 350
         self.facingRight = True
-        self.xspeed = 0
-        self.yspeed = 0
+        self.x_speed = 0
+        self.y_speed = 0
         self.flap = False
         self.walking = True
         self.spawning = True

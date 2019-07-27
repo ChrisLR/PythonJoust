@@ -1,7 +1,9 @@
 # Joust by S Paget
 
-import pygame, random
+import random
+import pygame
 from spriteloader import Spriteloader
+from terrain.platform import Platform
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -23,16 +25,7 @@ class GodMode(pygame.sprite.Sprite):
             self.timer = current_time + 1000
 
 
-def drawLava(screen):
-    lavaRect = [0, 600, 900, 50]
-    pygame.draw.rect(screen, (255, 0, 0), lavaRect)
-    return lavaRect
 
-
-def drawLava2(screen):
-    lavaRect = [0, 620, 900, 30]
-    pygame.draw.rect(screen, (255, 0, 0), lavaRect)
-    return lavaRect
 
 
 def drawLives(lives, screen, lifeimage):
@@ -58,47 +51,29 @@ class Game(object):
         self.enemies = []
         self.platforms = []
         self.players = []
+        self.render_updates = {}
+        self.window = pygame.display.set_mode((900, 650))
+        pygame.display.set_caption('Joust')
+        self.screen = pygame.display.get_surface()
+        self.clear_surface = self.screen.copy()
 
-    def prepare_platforms(self, sprite_loader):
-        platform_images = [
-            sprite_loader.get_image("plat1.png"),
-            sprite_loader.get_image("plat2.png"),
-            sprite_loader.get_image("plat3.png"),
-            sprite_loader.get_image("plat4.png"),
-            sprite_loader.get_image("plat5.png"),
-            sprite_loader.get_image("plat6.png"),
-            sprite_loader.get_image("plat7.png"),
-            sprite_loader.get_image("plat8.png"),
-        ]
-
-        return platform_images
-
-    def generateEnemies(self, enemyimages, spawnimages, unmountedimages, enemyList, spawnPoints, enemiesToSpawn):
-        # makes 2 enemies at a time, at 2 random spawn points
-        for count in range(2):
-            enemyList.add(enemyClass(enemyimages, spawnimages, unmountedimages, spawnPoints[random.randint(0, 3)],
-                                     0))  # last 0 is enemytype
-            enemiesToSpawn -= 1
-
-        return enemyList, enemiesToSpawn
+    def register_sprite(self, sprite):
+        render_update = self.render_updates.setdefault(
+            type(sprite),
+            pygame.sprite.RenderUpdates()
+        )
+        render_update.add(sprite)
 
 
 def main():
-    window = pygame.display.set_mode((900, 650))
-    pygame.display.set_caption('Joust')
-    screen = pygame.display.get_surface()
-    clearSurface = screen.copy()
-    player = pygame.sprite.RenderUpdates()
-    enemyList = pygame.sprite.RenderUpdates()
-    eggList = pygame.sprite.RenderUpdates()
-    platforms = pygame.sprite.RenderUpdates()
-    godSprite = pygame.sprite.RenderUpdates()
-    birdimages = spriteloader.get_sliced_sprites(60, 60, "playerMounted.png")
+
+
+
     enemyimages = spriteloader.get_sliced_sprites(60, 58, "enemies2.png")
-    spawnimages = spriteloader.get_sliced_sprites(60, 60, "spawn1.png")
+
     unmountedimages = spriteloader.get_sliced_sprites(60, 60, "unmounted.png")
-    playerUnmountedimages = spriteloader.get_sliced_sprites(60, 60, "playerUnmounted.png")
-    eggimages = spriteloader.get_sliced_sprites(40, 33, "egg.png")
+
+
     lifeimage = pygame.image.load("life.png")
     lifeimage = lifeimage.convert_alpha()
     digits = spriteloader.get_sliced_sprites(21, 21, "digits.png")
@@ -106,21 +81,12 @@ def main():
     playerbird = playerClass(birdimages, spawnimages, playerUnmountedimages)
     god = godmode()
     godSprite.add(godmode())
-    spawnPoints = [[690, 248], [420, 500], [420, 80], [50, 255]]
-    plat1 = platformClass(platformImages[0], 200,
-                          550)  # we create each platform by sending it the relevant platform image, the x position of the platform and the y position
-    plat2 = platformClass(platformImages[1], 350, 395)
-    plat3 = platformClass(platformImages[2], 350, 130)
-    plat4 = platformClass(platformImages[3], 0, 100)
-    plat5 = platformClass(platformImages[4], 759, 100)
-    plat6 = platformClass(platformImages[5], 0, 310)
-    plat7 = platformClass(platformImages[6], 759, 310)
-    plat8 = platformClass(platformImages[7], 600, 290)
+
+
     player.add(playerbird)
-    platforms.add(plat1, plat2, plat3, plat4, plat5, plat6, plat7, plat8)
     pygame.display.update()
     nextSpawnTime = pygame.time.get_ticks() + 2000
-    enemiesToSpawn = 6  # test. make 6 enemies to start
+
     score = 0
     running = True
     while running:

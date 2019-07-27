@@ -5,6 +5,8 @@ import pygame
 
 
 class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
+    name = ""
+
     def __init__(self, game, x, y, images, spawn_images, unmounted_images):
         super().__init__()
         self.game = game
@@ -36,10 +38,6 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def die(self):
-        pass
-
-    @abc.abstractmethod
-    def killed(self):
         pass
 
     @abc.abstractmethod

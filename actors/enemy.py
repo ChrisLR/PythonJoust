@@ -1,14 +1,25 @@
+import random
+
+import pygame
+
+from actors import listing
 from actors.base import Rider
 
 
+@listing.register
 class Enemy(Rider):
+    name = "Enemy"
+
     def __init__(self, game, x, y, enemy_images, spawn_images, unmounted_images, enemy_type):
         super().__init__(game, x, y, enemy_images, spawn_images, unmounted_images)
         self.enemy_type = enemy_type
 
-    def killed(self, eggList, eggimages):
+    def die(self):
         # make an egg appear here
-        eggList.add(eggClass(eggimages, self.x, self.y, self.xspeed, self.yspeed))
+        egg = listing.get("Egg")(self.game, self.x, self.y)
+        egg.x_speed = self.x_speed
+        egg.y_speed = self.y_speed
+        self.game.register_sprite(egg)
         self.alive = False
 
     def update(self, current_time, keys, platforms, god):

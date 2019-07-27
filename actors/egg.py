@@ -1,26 +1,28 @@
+import pygame
 
-class eggClass(pygame.sprite.Sprite):
-    def __init__(self, eggimages, x, y, xspeed, yspeed):
-        pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
-        self.images = eggimages
+from actors import listing
+from actors.base import Actor
+
+
+@listing.register
+class Egg(Actor):
+    name = "Egg"
+
+    def __init__(self, game, x, y):
+        egg_images = game.spriteloader.get_sliced_sprites(40, 33, "egg.png")
+        super().__init__(game, x, y, egg_images, None, None)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.xspeed = xspeed
-        self.yspeed = yspeed
         self.rect.topleft = (x, y)
-        self.right = self.rect.right
-        self.top = self.rect.top
         self.next_update_time = 0
 
     def move(self):
         # gravity
         self.yspeed += 0.4
-        if self.yspeed > 10:
-            self.yspeed = 10
-        self.y += self.yspeed
-        self.x += self.xspeed
+        if self.y_speed > 10:
+            self.y_speed = 10
+        self.y += self.y_speed
+        self.x += self.x_speed
         if self.y > 570:  # hit lava
             self.kill()
 
@@ -43,28 +45,3 @@ class eggClass(pygame.sprite.Sprite):
                 self.x = 900
             if self.x > 900:
                 self.x = -48
-
-    def bounce(self, collidedThing):
-        collided = False
-        if self.y < (collidedThing.y - 20) and (
-        (self.x > (collidedThing.x - 40) and self.x < (collidedThing.rect.right - 10))):
-            # coming in from the top?
-            self.walking = True
-            self.yspeed = 0
-            self.y = collidedThing.y - self.rect.height + 1
-        elif self.x < collidedThing.x:
-            # colliding from left side
-            collided = True
-            self.x = self.x - 10
-            self.xspeed = -2
-        elif self.x > collidedThing.rect.right - 50:
-            # colliding from right side
-            collided = True
-            self.x = self.x + 10
-            self.xspeed = 2
-        elif self.y > collidedThing.y:
-            # colliding from bottom
-            collided = True
-            self.y = self.y + 10
-            self.yspeed = 0
-        return collided
