@@ -1,42 +1,15 @@
 # Joust by S Paget
 
 import pygame, random
-import spriteloader
+from spriteloader import Spriteloader
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 
 
-
-
-def load_platforms(sprite_loader):
-    platform_images = [
-        sprite_loader.get_image("plat1.png"),
-        sprite_loader.get_image("plat2.png"),
-        sprite_loader.get_image("plat3.png"),
-        sprite_loader.get_image("plat4.png"),
-        sprite_loader.get_image("plat5.png"),
-        sprite_loader.get_image("plat6.png"),
-        sprite_loader.get_image("plat7.png"),
-        sprite_loader.get_image("plat8.png"),
-    ]
-
-    return platform_images
-
-class platformClass(pygame.sprite.Sprite):
-    def __init__(self, image, x, y):
-        pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
-        self.image = image
-        self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.topleft = (x, y)
-        self.right = self.rect.right
-        self.top = self.rect.top
-
-class godmode(pygame.sprite.Sprite):
+class GodMode(pygame.sprite.Sprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)  # call Sprite initializer
+        super().__init__()
         self.pic = pygame.image.load("god.png")
         self.image = self.pic
         self.on = False
@@ -48,20 +21,6 @@ class godmode(pygame.sprite.Sprite):
         if current_time > self.timer:
             self.on = not self.on
             self.timer = current_time + 1000
-
-
-class pointsMarker(pygame.sprite.Sprite):
-    pass
-
-
-def generateEnemies(enemyimages, spawnimages, unmountedimages, enemyList, spawnPoints, enemiesToSpawn):
-    # makes 2 enemies at a time, at 2 random spawn points
-    for count in range(2):
-        enemyList.add(enemyClass(enemyimages, spawnimages, unmountedimages, spawnPoints[random.randint(0, 3)],
-                                 0))  # last 0 is enemytype
-        enemiesToSpawn -= 1
-
-    return enemyList, enemiesToSpawn
 
 
 def drawLava(screen):
@@ -92,6 +51,38 @@ def drawScore(score, screen, digits):
     screen.blit(digits[(score % 1000000) // 100000], [263, 570])
 
 
+class Game(object):
+    def __init__(self):
+        self.sprite_loader = Spriteloader()
+        self.god_mode = GodMode()
+        self.enemies = []
+        self.platforms = []
+        self.players = []
+
+    def prepare_platforms(self, sprite_loader):
+        platform_images = [
+            sprite_loader.get_image("plat1.png"),
+            sprite_loader.get_image("plat2.png"),
+            sprite_loader.get_image("plat3.png"),
+            sprite_loader.get_image("plat4.png"),
+            sprite_loader.get_image("plat5.png"),
+            sprite_loader.get_image("plat6.png"),
+            sprite_loader.get_image("plat7.png"),
+            sprite_loader.get_image("plat8.png"),
+        ]
+
+        return platform_images
+
+    def generateEnemies(self, enemyimages, spawnimages, unmountedimages, enemyList, spawnPoints, enemiesToSpawn):
+        # makes 2 enemies at a time, at 2 random spawn points
+        for count in range(2):
+            enemyList.add(enemyClass(enemyimages, spawnimages, unmountedimages, spawnPoints[random.randint(0, 3)],
+                                     0))  # last 0 is enemytype
+            enemiesToSpawn -= 1
+
+        return enemyList, enemiesToSpawn
+
+
 def main():
     window = pygame.display.set_mode((900, 650))
     pygame.display.set_caption('Joust')
@@ -102,15 +93,15 @@ def main():
     eggList = pygame.sprite.RenderUpdates()
     platforms = pygame.sprite.RenderUpdates()
     godSprite = pygame.sprite.RenderUpdates()
-    birdimages = spriteloader.load_sliced_sprites(60, 60, "playerMounted.png")
-    enemyimages = spriteloader.load_sliced_sprites(60, 58, "enemies2.png")
-    spawnimages = spriteloader.load_sliced_sprites(60, 60, "spawn1.png")
-    unmountedimages = spriteloader.load_sliced_sprites(60, 60, "unmounted.png")
-    playerUnmountedimages = spriteloader.load_sliced_sprites(60, 60, "playerUnmounted.png")
-    eggimages = spriteloader.load_sliced_sprites(40, 33, "egg.png")
+    birdimages = spriteloader.get_sliced_sprites(60, 60, "playerMounted.png")
+    enemyimages = spriteloader.get_sliced_sprites(60, 58, "enemies2.png")
+    spawnimages = spriteloader.get_sliced_sprites(60, 60, "spawn1.png")
+    unmountedimages = spriteloader.get_sliced_sprites(60, 60, "unmounted.png")
+    playerUnmountedimages = spriteloader.get_sliced_sprites(60, 60, "playerUnmounted.png")
+    eggimages = spriteloader.get_sliced_sprites(40, 33, "egg.png")
     lifeimage = pygame.image.load("life.png")
     lifeimage = lifeimage.convert_alpha()
-    digits = spriteloader.load_sliced_sprites(21, 21, "digits.png")
+    digits = spriteloader.get_sliced_sprites(21, 21, "digits.png")
     platformImages = spriteloader.load_platforms()
     playerbird = playerClass(birdimages, spawnimages, playerUnmountedimages)
     god = godmode()
