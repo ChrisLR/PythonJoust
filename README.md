@@ -1,9 +1,16 @@
+
+
+
+
+
 PythonJoust
 ===========
+Original PythonJoust at https://github.com/StevePaget/PythonJoust
+Thanks to Steve Paget for allowing us to look and tinker with his code!
 
-A version of Joust, the old arcade game. I'm just making this for fun, and to brush up my Pygame skills.
 
-Requirements:
+Requirements
+===========
 
 Python 3 (get the latest one from python.org)
 
