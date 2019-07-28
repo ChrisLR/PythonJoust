@@ -9,7 +9,7 @@ from terrain import Platform
 class BasicLevel(object):
     def __init__(self, game):
         self.game = game
-        self._lava_rectangles = [
+        self.lava_rectangles = [
             [0, 600, 900, 50],
             [0, 620, 900, 30],
         ]
@@ -55,7 +55,7 @@ class BasicLevel(object):
             self.next_spawn_time = current_time + 5000
 
     def _draw_lava(self, screen):
-        for lava_rect in self._lava_rectangles:
+        for lava_rect in self.lava_rectangles:
             pygame.draw.rect(screen, (255, 0, 0), lava_rect)
 
     def spawn_enemies(self):

@@ -14,7 +14,7 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
         self.spawn_images = spawn_images
         self.unmounted_images = unmounted_images
         self.frameNum = 0
-        self.image = self.spawn_images[0]
+        self.image = self.spawn_images[0] if spawn_images else images[0]
         self.rect = self.image.get_rect()
         self.next_update_time = 0
         self.next_anim_time = 0
@@ -54,13 +54,17 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
             self, level.platforms, False,
             collided=pygame.sprite.collide_mask
         )
+        collided = False
         if (((self.y > 40 and self.y < 45) or (self.y > 250 and self.y < 255)) and (
                 self.x < 0 or self.x > 860)):  # catch when it is rolling between screens
             self.y_speed = 0
             self.walking = True
         else:
+            self.walking = False
             for collided_platform in collided_platforms:
-                self.bounce(collided_platform)
+                collided = self.bounce(collided_platform)
+
+        return collided
 
 
 class Rider(Actor, metaclass=abc.ABCMeta):

@@ -7,7 +7,7 @@ class Egg(Actor):
     name = "Egg"
 
     def __init__(self, game, x, y):
-        egg_images = game.spriteloader.get_sliced_sprites(40, 33, "egg.png")
+        egg_images = game.sprite_loader.get_sliced_sprites(40, 33, "egg.png")
         super().__init__(game, x, y, egg_images, None, None)
         self.image = self.images[0]
         self.rect = self.image.get_rect()
@@ -36,3 +36,12 @@ class Egg(Actor):
                 self.x = 900
             if self.x > 900:
                 self.x = -48
+
+    def bounce(self, colliding_object):
+        pass
+
+    def die(self):
+        pass
+
+    def respawn(self):
+        pass

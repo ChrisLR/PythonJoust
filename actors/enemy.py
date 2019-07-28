@@ -30,14 +30,14 @@ class Enemy(Rider):
             self.next_update_time = current_time + 50
             if self.spawning:
                 self.frameNum += 1
-                self.image = self.spawnimages[self.frameNum]
+                self.image = self.spawn_images[self.frameNum]
                 self.next_update_time += 100
                 self.rect.topleft = (self.x, self.y)
                 if self.frameNum == 5:
                     self.spawning = False
             else:
                 # see if we need to accelerate
-                if abs(self.x_speed) < self.targetXSpeed:
+                if abs(self.x_speed) < self.target_x_speed:
                     self.x_speed += self.x_speed / abs(self.x_speed) / 2
                 # work out if flapping...
                 if self.flap < 1:
@@ -90,12 +90,15 @@ class Enemy(Rider):
                     else:
                         self.frameNum = 5
                 if self.alive:
-                    self.image = self.images[((self.enemyType * 7) + self.frameNum)]
+                    self.image = self.images[self.frameNum]
                 else:
                     # show the unmounted sprite
-                    self.image = self.unmountedimages[self.frameNum]
-                if self.x_speed < 0 or (self.x_speed == 0 and self.facingRight == False):
+                    self.image = self.unmounted_images[self.frameNum]
+                if self.x_speed < 0 or (self.x_speed == 0 and self.facingRight is False):
                     self.image = pygame.transform.flip(self.image, True, False)
                     self.facingRight = False
                 else:
                     self.facingRight = True
+
+    def respawn(self):
+        pass
