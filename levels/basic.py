@@ -30,32 +30,42 @@ class BasicLevel(object):
         self.enemy_spawn_points = [
             [690, 248], [420, 500], [420, 80], [50, 255]
         ]
+        self.player_spawn_points = [
+            (415, 350),
+        ]
+        self.next_spawn_time = 0
+        self.enemies = []
 
     def prepare(self):
         for platform in self.platforms:
             self.game.register_sprite(platform)
         self.spawn_enemies()
+        self.next_spawn_time = pygame.time.get_ticks() + 2000
 
     def clear(self):
         pass
 
-    def draw(self):
-        pass
+    def draw(self, screen):
+        self._draw_lava(screen)
 
-    def update(self):
-        pass
+    def update(self, current_time):
+        # make enemies
+        if current_time > self.next_spawn_time and self.enemies_to_spawn > 0:
+            self.spawn_enemies()
+            self.next_spawn_time = current_time + 5000
 
     def _draw_lava(self, screen):
         for lava_rect in self._lava_rectangles:
             pygame.draw.rect(screen, (255, 0, 0), lava_rect)
-
-    def _draw_platforms(self):
-        pass
 
     def spawn_enemies(self):
         # makes 2 enemies at a time, at 2 random spawn points
         for count in range(2):
             spawn_point = random.choice(self.enemy_spawn_points)
             enemy = Enemy(self.game, *spawn_point)
+            self.enemies.append(enemy)
             self.game.register_sprite(enemy)
             self.enemies_to_spawn -= 1
+
+    def get_player_spawn(self):
+        return random.choice(self.player_spawn_points)
