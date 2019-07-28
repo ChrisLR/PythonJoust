@@ -45,8 +45,22 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def update(self):
+    def update(self, current_time):
         pass
+
+    def _handle_platform_collision(self):
+        level = self.game.level
+        collided_platforms = pygame.sprite.spritecollide(
+            self, level.platforms, False,
+            collided=pygame.sprite.collide_mask
+        )
+        if (((self.y > 40 and self.y < 45) or (self.y > 250 and self.y < 255)) and (
+                self.x < 0 or self.x > 860)):  # catch when it is rolling between screens
+            self.y_speed = 0
+            self.walking = True
+        else:
+            for collided_platform in collided_platforms:
+                self.bounce(collided_platform)
 
 
 class Rider(Actor, metaclass=abc.ABCMeta):

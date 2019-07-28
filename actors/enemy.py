@@ -10,9 +10,12 @@ from actors.base import Rider
 class Enemy(Rider):
     name = "Enemy"
 
-    def __init__(self, game, x, y, enemy_images, spawn_images, unmounted_images, enemy_type):
+    def __init__(self, game, x, y):
+        sprite_loader = game.sprite_loader
+        enemy_images = sprite_loader.get_sliced_sprites(60, 58, "enemies2.png")
+        spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
+        unmounted_images = sprite_loader.get_sliced_sprites(60, 60, "unmounted.png")
         super().__init__(game, x, y, enemy_images, spawn_images, unmounted_images)
-        self.enemy_type = enemy_type
 
     def die(self):
         # make an egg appear here
@@ -22,7 +25,7 @@ class Enemy(Rider):
         self.game.register_sprite(egg)
         self.alive = False
 
-    def update(self, current_time, keys, platforms, god):
+    def update(self, current_time):
         if self.next_update_time < current_time:  # only update every 30 millis
             self.next_update_time = current_time + 50
             if self.spawning:
@@ -34,27 +37,27 @@ class Enemy(Rider):
                     self.spawning = False
             else:
                 # see if we need to accelerate
-                if abs(self.xspeed) < self.targetXSpeed:
-                    self.xspeed += self.xspeed / abs(self.xspeed) / 2
+                if abs(self.x_speed) < self.targetXSpeed:
+                    self.x_speed += self.x_speed / abs(self.x_speed) / 2
                 # work out if flapping...
                 if self.flap < 1:
                     if (random.randint(0, 10) > 8 or self.y > 450):  # flap to avoid lava
-                        self.yspeed -= 3
+                        self.y_speed -= 3
                         self.flap = 3
                 else:
                     self.flap -= 1
 
-                self.x = self.x + self.xspeed
-                self.y = self.y + self.yspeed
+                self.x = self.x + self.x_speed
+                self.y = self.y + self.y_speed
                 if not self.walking:
-                    self.yspeed += 0.4
-                if self.yspeed > 10:
-                    self.yspeed = 10
-                if self.yspeed < -10:
-                    self.yspeed = -10
+                    self.y_speed += 0.4
+                if self.y_speed > 10:
+                    self.y_speed = 10
+                if self.y_speed < -10:
+                    self.y_speed = -10
                 if self.y < 0:  # can't go off the top
                     self.y = 0
-                    self.yspeed = 2
+                    self.y_speed = 2
                 if self.y > 570:  # hit lava
                     self.kill()
 
@@ -69,22 +72,13 @@ class Enemy(Rider):
                     else:
                         self.kill()
                 self.rect.topleft = (self.x, self.y)
-                # check for platform collision
-                collidedPlatforms = pygame.sprite.spritecollide(self, platforms, False,
-                                                                collided=pygame.sprite.collide_mask)
-                self.walking = False
-                if (((self.y > 40 and self.y < 45) or (self.y > 220 and self.y < 225)) and (
-                        self.x < 0 or self.x > 860)):  # catch when it is walking between screens
-                    self.walking = True
-                    self.yspeed = 0
-                else:
-                    for collidedPlatform in collidedPlatforms:
-                        self.bounce(collidedPlatform)
+                self._handle_platform_collision()
+
                 self.rect.topleft = (self.x, self.y)
                 if self.walking:
                     if self.next_anim_time < current_time:
-                        if self.xspeed != 0:
-                            self.next_anim_time = current_time + 100 / abs(self.xspeed)
+                        if self.x_speed != 0:
+                            self.next_anim_time = current_time + 100 / abs(self.x_speed)
                             self.frameNum += 1
                             if self.frameNum > 3:
                                 self.frameNum = 0
@@ -100,9 +94,8 @@ class Enemy(Rider):
                 else:
                     # show the unmounted sprite
                     self.image = self.unmountedimages[self.frameNum]
-                if self.xspeed < 0 or (self.xspeed == 0 and self.facingRight == False):
+                if self.x_speed < 0 or (self.x_speed == 0 and self.facingRight == False):
                     self.image = pygame.transform.flip(self.image, True, False)
                     self.facingRight = False
                 else:
                     self.facingRight = True
-
