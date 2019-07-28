@@ -88,7 +88,7 @@ class Game(object):
         running = True
         while running:
             current_time = pygame.time.get_ticks()
-            level.update(current_time)
+            self.level.update(current_time)
             # TODO Extract key handling
             keys = pygame.key.get_pressed()
             pygame.event.clear()
@@ -107,7 +107,7 @@ class Game(object):
             # TODO Handle not drawing god?
             # godrect = pygame.Rect(850, 0, 50, 50)
 
-            level.draw(self.screen)
+            self.level.draw(self.screen)
             # TODO Original code only updates portions of the screen
             # Is this necessary?
             pygame.display.update()
@@ -117,6 +117,6 @@ if __name__ == '__main__':
     pygame.mixer.pre_init(44100, -16, 2, 512)
     pygame.init()
     game = Game()
-    level = BasicLevel(game)
-    game.start(level)
+    starting_level = BasicLevel(game)
+    game.start(starting_level)
     pygame.quit()
