@@ -71,6 +71,10 @@ class Game(object):
         self.score = 0
         self.running = False
 
+    @property
+    def lives(self):
+        return self.players[0].lives
+
     def register_sprite(self, sprite):
         render_update = self.render_updates.setdefault(
             type(sprite),
@@ -107,8 +111,7 @@ class Game(object):
             # godrect = pygame.Rect(850, 0, 50, 50)
 
             self.level.draw(self.screen)
-            # TODO Original code only updates portions of the screen
-            # Is this necessary?
+            self.hud.draw()
             draw_rects.extend(self.level.lava_rectangles)
             pygame.display.update(draw_rects)
 

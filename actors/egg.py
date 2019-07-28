@@ -16,10 +16,12 @@ class Egg(Actor):
 
     def move(self):
         # gravity
-        self.y_speed += 0.4
-        if self.y_speed > 10:
-            self.y_speed = 10
-        self.y += self.y_speed
+        if not self.walking:
+            self.y_speed += 0.4
+            if self.y_speed > 10:
+                self.y_speed = 10
+            self.y += self.y_speed
+
         self.x += self.x_speed
         if self.y > 570:  # hit lava
             self.kill()
@@ -31,14 +33,12 @@ class Egg(Actor):
             self.move()
             self.rect.topleft = (self.x, self.y)
             self._handle_platform_collision()
+
             # wrap round screens
             if self.x < -48:
                 self.x = 900
             if self.x > 900:
                 self.x = -48
-
-    def bounce(self, colliding_object):
-        pass
 
     def die(self):
         pass
