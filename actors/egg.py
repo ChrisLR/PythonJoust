@@ -37,8 +37,8 @@ class Egg(Actor):
             # wrap round screens
             if self.x < -48:
                 self.x = 900
-            if self.x > 900:
-                self.x = -48
+            elif self.x > 900:
+                self.x = 0
 
     def die(self):
         pass
