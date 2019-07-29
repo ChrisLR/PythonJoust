@@ -56,16 +56,16 @@ class HUD(object):
 
 class Game(object):
     def __init__(self):
+        self.window = pygame.display.set_mode((900, 650))
+        pygame.display.set_caption('Joust')
+        self.screen = pygame.display.get_surface()
+        self.clear_surface = self.screen.copy()
         self.sprite_loader = Spriteloader()
         self.god_mode = GodMode(self)
         self.enemies = []
         self.platforms = []
         self.players = []
         self.render_updates = {}
-        self.window = pygame.display.set_mode((900, 650))
-        pygame.display.set_caption('Joust')
-        self.screen = pygame.display.get_surface()
-        self.clear_surface = self.screen.copy()
         self.level = None
         self.hud = HUD(self)
         self.score = 0

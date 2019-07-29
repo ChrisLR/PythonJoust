@@ -79,15 +79,7 @@ class Player(Rider):
                         self.y_speed = 10
                     if self.y_speed < -10:
                         self.y_speed = -10
-                    if self.y < 0:
-                        self.y = 0
-                        self.y_speed = 2
-                    if self.y > 570:
-                        self.die()
-                    if self.x < -48:
-                        self.x = 900
-                    if self.x > 900:
-                        self.x = -48
+                    self._handle_out_of_bounds(current_time)
                     self.rect.topleft = (self.x, self.y)
                     self._handle_bird_collisions()
                     # check for platform collision
@@ -151,18 +143,9 @@ class Player(Rider):
                     self.y_speed = 10
                 if self.y_speed < -10:
                     self.y_speed = -10
-                if self.y < 0:  # can't go off the top
-                    self.y = 0
-                    self.y_speed = 2
 
-                if self.x < -48:  # off the left. remove entirely
-                    self.image = self.images[7]
-                    self.alive = 0
-                    self.next_update_time = current_time + 2000
-                if self.x > 900:  # off the right. remove entirely
-                    self.image = self.images[7]
-                    self.alive = 0
-                    self.next_update_time = current_time + 2000
+                self._handle_out_of_bounds(current_time, remove=True)
+
                 self.rect.topleft = (self.x, self.y)
                 # check for platform collision
                 self._handle_platform_collision()
@@ -213,6 +196,31 @@ class Player(Rider):
             elif bird.alive:
                 self.bounce(bird)
                 bird.bounce(self)
+
+    def _handle_out_of_bounds(self, current_time, remove=False):
+        if self.y < 0:
+            self.y = 0
+            self.y_speed = 2
+        if self.y > 570:
+            self.die()
+            self.alive = 0
+            self.next_update_time = current_time + 2000
+            self.y = 800
+            return
+        if self.x < -48:
+            if remove is True:
+                self.image = self.images[7]
+                self.alive = 0
+                self.next_update_time = current_time + 2000
+            else:
+                self.x = 900
+        if self.x > 900:
+            if remove is True:
+                self.image = self.images[7]
+                self.alive = 0
+                self.next_update_time = current_time + 2000
+            else:
+                self.x = -48
 
     def die(self):
         self.lives -= 1
