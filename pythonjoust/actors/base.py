@@ -125,7 +125,7 @@ class Rider(Actor, metaclass=abc.ABCMeta):
             self.next_update_time = current_time + 2000
             self.y = 800
             return
-        if self.x < -48:
+        if self.x < -64:
             if remove is True:
                 self.image = self.images[-1]
                 self.state = RiderState.Dead
