@@ -2,7 +2,7 @@ class HUD(object):
     def __init__(self, game):
         self.game = game
         sprite_loader = game.sprite_loader
-        self.life_image = sprite_loader.get_image("life.png").convert_alpha()
+        self.life_image = sprite_loader.get_image("life.png")
         self.digits_image = sprite_loader.get_sliced_sprites(21, 21, "digits.png")
 
     def draw(self):

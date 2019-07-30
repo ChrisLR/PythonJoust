@@ -81,9 +81,9 @@ class Game(object):
             self.level.update(current_time)
             self._handle_input(current_time)
             draw_rects = []
-            for render_update in list(self.render_updates.values()):
+            render_updates = list(self.render_updates.values())
+            for render_update in render_updates:
                 render_update.update(current_time)
-                render_update.clear(self.screen, self.clear_surface)
                 draw_rect = render_update.draw(self.screen)
                 if draw_rect is not None:
                     draw_rects.extend(draw_rect)
@@ -92,6 +92,9 @@ class Game(object):
             self.hud.draw()
             draw_rects.extend(self.level.lava_rectangles)
             pygame.display.update(draw_rects)
+
+            for render_update in render_updates:
+                render_update.clear(self.screen, self.clear_surface)
 
     def _handle_input(self, current_time):
         all_keys = pygame.key.get_pressed()
