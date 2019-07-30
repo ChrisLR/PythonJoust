@@ -11,6 +11,7 @@ from actors.base import Rider
 @listing.register
 class Player(Rider):
     name = "Player"
+    update_cycle_time = 30
 
     def __init__(self, game, x, y):
         sprite_loader = game.sprite_loader
@@ -18,10 +19,10 @@ class Player(Rider):
         spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
         unmounted_images = sprite_loader.get_sliced_sprites(60, 60, "playerUnMounted.png")
         super().__init__(game, x, y, bird_images, spawn_images, unmounted_images)
-        self.frameNum = 2
-        self.image = self.images[self.frameNum]
+        self.frame_num = 2
+        self.image = self.images[self.frame_num]
         self.rect = self.image.get_rect()
-        self.playerChannel = pygame.mixer.Channel(0)
+        self.player_channel = pygame.mixer.Channel(0)
         self.flap_sound = pygame.mixer.Sound(os.path.join("sounds", "joustflaedit.wav"))
         self.skid_sound = pygame.mixer.Sound(os.path.join("sounds", "joustski.wav"))
         self.bump_sound = pygame.mixer.Sound(os.path.join("sounds", "joustthu.wav"))
@@ -34,25 +35,14 @@ class Player(Rider):
         # TODO This needs to handle actions.
         self.action_keys = action_keys
 
-    def update(self, current_time):
-        # Update every 30 milliseconds
-        if self.next_update_time < current_time:
-            self.next_update_time = current_time + 30
-            if self.alive == 2:
-                self._update_mounted(current_time)
-            elif self.alive == 1:
-                self._update_unmounted(current_time)
-            else:
-                self._update_dead(current_time)
-
     def _update_mounted(self, current_time):
         if self.spawning:
-            self.frameNum += 1
-            self.image = self.spawn_images[self.frameNum]
+            self.frame_num += 1
+            self.image = self.spawn_images[self.frame_num]
             self.next_update_time += 100
             self.rect.topleft = (self.x, self.y)
-            if self.frameNum == 5:
-                self.frameNum = 4
+            if self.frame_num == 5:
+                self.frame_num = 4
                 self.spawning = False
         else:
             walking_left = False
@@ -68,7 +58,7 @@ class Player(Rider):
                     self.x_speed += 0.5
             if keymap.ActionKey.Flap in self.action_keys:
                 if not self.flap:
-                    self.playerChannel.stop()
+                    self.player_channel.stop()
                     self.flap_sound.play(0)
                     if self.y_speed > -250:
                         self.y_speed -= 3
@@ -91,7 +81,7 @@ class Player(Rider):
             collided = self._handle_platform_collision()
             if collided:
                 # play a bump sound
-                self.playerChannel.play(self.bump_sound)
+                self.player_channel.play(self.bump_sound)
             self.rect.topleft = (self.x, self.y)
             if self.walking:
                 # if walking
@@ -100,30 +90,30 @@ class Player(Rider):
                         if (self.x_speed > 5 and walking_left) or (
                                 self.x_speed < -5 and walking_right):
 
-                            if self.frameNum != 4:
-                                self.playerChannel.play(self.skid_sound)
-                            self.frameNum = 4
+                            if self.frame_num != 4:
+                                self.player_channel.play(self.skid_sound)
+                            self.frame_num = 4
                         else:
                             self.next_anim_time = current_time + 200 / abs(self.x_speed)
-                            self.frameNum += 1
-                            if self.frameNum > 3:
-                                self.frameNum = 0
-                    elif self.frameNum == 4:
-                        self.frameNum = 3
-                        self.playerChannel.stop()
+                            self.frame_num += 1
+                            if self.frame_num > 3:
+                                self.frame_num = 0
+                    elif self.frame_num == 4:
+                        self.frame_num = 3
+                        self.player_channel.stop()
 
-                self.image = self.images[self.frameNum]
+                self.image = self.images[self.frame_num]
             else:
                 if self.flap:
                     self.image = self.images[6]
 
                 else:
                     self.image = self.images[5]
-            if self.x_speed < 0 or (self.x_speed == 0 and self.facingRight is False):
+            if self.x_speed < 0 or (self.x_speed == 0 and self.facing_right is False):
                 self.image = pygame.transform.flip(self.image, True, False)
-                self.facingRight = False
+                self.facing_right = False
             else:
-                self.facingRight = True
+                self.facing_right = True
 
     def _update_unmounted(self, current_time):
         # unmounted player, lone bird
@@ -160,22 +150,22 @@ class Player(Rider):
             if self.next_anim_time < current_time:
                 if self.x_speed != 0:
                     self.next_anim_time = current_time + 100 / abs(self.x_speed)
-                    self.frameNum += 1
-                    if self.frameNum > 3:
-                        self.frameNum = 0
+                    self.frame_num += 1
+                    if self.frame_num > 3:
+                        self.frame_num = 0
                     else:
-                        self.frameNum = 3
+                        self.frame_num = 3
         else:
             if self.flap > 0:
-                self.frameNum = 6
+                self.frame_num = 6
             else:
-                self.frameNum = 5
-        self.image = self.unmounted_images[self.frameNum]
-        if self.x_speed < 0 or (self.x_speed == 0 and self.facingRight is False):
+                self.frame_num = 5
+        self.image = self.unmounted_images[self.frame_num]
+        if self.x_speed < 0 or (self.x_speed == 0 and self.facing_right is False):
             self.image = pygame.transform.flip(self.image, True, False)
-            self.facingRight = False
+            self.facing_right = False
         else:
-            self.facingRight = True
+            self.facing_right = True
 
     def _update_dead(self, current_time):
         # player respawn
@@ -204,42 +194,17 @@ class Player(Rider):
                 self.bounce(bird)
                 bird.bounce(self)
 
-    def _handle_out_of_bounds(self, current_time, remove=False):
-        if self.y < 0:
-            self.y = 0
-            self.y_speed = 2
-        if self.y > 570:
-            self.die()
-            self.alive = 0
-            self.next_update_time = current_time + 2000
-            self.y = 800
-            return
-        if self.x < -48:
-            if remove is True:
-                self.image = self.images[7]
-                self.alive = 0
-                self.next_update_time = current_time + 2000
-            else:
-                self.x = 900
-        if self.x > 900:
-            if remove is True:
-                self.image = self.images[7]
-                self.alive = 0
-                self.next_update_time = current_time + 2000
-            else:
-                self.x = -48
-
     def die(self):
         self.lives -= 1
         self.alive = 1
 
     def respawn(self):
-        self.frameNum = 1
-        self.image = self.images[self.frameNum]
+        self.frame_num = 1
+        self.image = self.images[self.frame_num]
         self.rect = self.image.get_rect()
-        self.x = 415
-        self.y = 350
-        self.facingRight = True
+        self.x = self.starting_x
+        self.y = self.starting_y
+        self.facing_right = True
         self.x_speed = 0
         self.y_speed = 0
         self.flap = False

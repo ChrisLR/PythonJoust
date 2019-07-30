@@ -23,82 +23,74 @@ class Enemy(Rider):
         egg.x_speed = self.x_speed
         egg.y_speed = self.y_speed
         self.game.register_sprite(egg)
-        self.alive = False
+        self.alive = 1
 
-    def update(self, current_time):
-        if self.next_update_time < current_time:  # only update every 30 millis
-            self.next_update_time = current_time + 50
-            if self.spawning:
-                self.frameNum += 1
-                self.image = self.spawn_images[self.frameNum]
-                self.next_update_time += 100
-                self.rect.topleft = (self.x, self.y)
-                if self.frameNum == 5:
-                    self.spawning = False
+    def _update_mounted(self, current_time):
+        if self.spawning:
+            self.frame_num += 1
+            self.image = self.spawn_images[self.frame_num]
+            self.next_update_time += 100
+            self.rect.topleft = (self.x, self.y)
+            if self.frame_num == 5:
+                self.spawning = False
+            return
+
+        self._handle_platform_collision()
+        self._accelerate_or_flap(current_time)
+        self._handle_out_of_bounds(current_time)
+        self.image = self.images[self.frame_num]
+        self._flip_for_direction()
+
+    def _update_unmounted(self, current_time):
+        self._handle_platform_collision()
+        self._accelerate_or_flap(current_time)
+        self._handle_out_of_bounds(current_time, remove=True)
+        self.image = self.unmounted_images[self.frame_num]
+        self._flip_for_direction()
+
+    def _update_dead(self, current_time):
+        self.kill()
+
+    def _accelerate_or_flap(self, current_time):
+        # see if we need to accelerate
+        if abs(self.x_speed) < self.target_x_speed:
+            self.x_speed += self.x_speed / abs(self.x_speed) / 2
+        # work out if flapping...
+        if self.flap < 1:
+            if (random.randint(0, 10) > 8 or self.y > 450):  # flap to avoid lava
+                self.y_speed -= 3
+                self.flap = 3
+        else:
+            self.flap -= 1
+
+        self.x = self.x + self.x_speed
+        self.y = self.y + self.y_speed
+        if not self.walking:
+            self.y_speed += 0.4
+
+        self.rect.topleft = (self.x, self.y)
+
+        if self.walking:
+            if self.next_anim_time < current_time:
+                if self.x_speed != 0:
+                    self.next_anim_time = current_time + 100 / abs(self.x_speed)
+                    self.frame_num += 1
+                    if self.frame_num > 3:
+                        self.frame_num = 0
+                    else:
+                        self.frame_num = 3
+        else:
+            if self.flap > 0:
+                self.frame_num = 6
             else:
-                # see if we need to accelerate
-                if abs(self.x_speed) < self.target_x_speed:
-                    self.x_speed += self.x_speed / abs(self.x_speed) / 2
-                # work out if flapping...
-                if self.flap < 1:
-                    if (random.randint(0, 10) > 8 or self.y > 450):  # flap to avoid lava
-                        self.y_speed -= 3
-                        self.flap = 3
-                else:
-                    self.flap -= 1
+                self.frame_num = 5
 
-                self.x = self.x + self.x_speed
-                self.y = self.y + self.y_speed
-                if not self.walking:
-                    self.y_speed += 0.4
-                if self.y_speed > 10:
-                    self.y_speed = 10
-                if self.y_speed < -10:
-                    self.y_speed = -10
-                if self.y < 0:  # can't go off the top
-                    self.y = 0
-                    self.y_speed = 2
-                if self.y > 570:  # hit lava
-                    self.kill()
-
-                if self.x < -48:  # off the left. If enemy is dead then remove entirely
-                    if self.alive:
-                        self.x = 900
-                    else:
-                        self.kill()
-                if self.x > 900:  # off the right. If enemy is dead then remove entirely
-                    if self.alive:
-                        self.x = -48
-                    else:
-                        self.kill()
-                self.rect.topleft = (self.x, self.y)
-                self._handle_platform_collision()
-
-                self.rect.topleft = (self.x, self.y)
-                if self.walking:
-                    if self.next_anim_time < current_time:
-                        if self.x_speed != 0:
-                            self.next_anim_time = current_time + 100 / abs(self.x_speed)
-                            self.frameNum += 1
-                            if self.frameNum > 3:
-                                self.frameNum = 0
-                            else:
-                                self.frameNum = 3
-                else:
-                    if self.flap > 0:
-                        self.frameNum = 6
-                    else:
-                        self.frameNum = 5
-                if self.alive:
-                    self.image = self.images[self.frameNum]
-                else:
-                    # show the unmounted sprite
-                    self.image = self.unmounted_images[self.frameNum]
-                if self.x_speed < 0 or (self.x_speed == 0 and self.facingRight is False):
-                    self.image = pygame.transform.flip(self.image, True, False)
-                    self.facingRight = False
-                else:
-                    self.facingRight = True
+    def _flip_for_direction(self):
+        if self.x_speed < 0 or (self.x_speed == 0 and self.facing_right is False):
+            self.image = pygame.transform.flip(self.image, True, False)
+            self.facing_right = False
+        else:
+            self.facing_right = True
 
     def respawn(self):
         pass

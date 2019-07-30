@@ -1,4 +1,4 @@
-# Joust by S Paget
+# Original Joust Code by S Paget
 
 import pygame
 
@@ -116,9 +116,6 @@ class Game(object):
                 draw_rect = render_update.draw(self.screen)
                 if draw_rect is not None:
                     draw_rects.extend(draw_rect)
-
-            # TODO Handle not drawing god?
-            # godrect = pygame.Rect(850, 0, 50, 50)
 
             self.level.draw(self.screen)
             self.hud.draw()
