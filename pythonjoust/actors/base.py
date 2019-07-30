@@ -9,6 +9,10 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
 
     def __init__(self, game, x, y, images, spawn_images, unmounted_images):
         super().__init__()
+        self.alive = 2
+        self.facing_right = True
+        self.flap = 0
+        self.flap_count = 0
         self.game = game
         self.images = images
         self.spawn_images = spawn_images
@@ -20,29 +24,13 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
         self.next_anim_time = 0
         self.starting_x = x
         self.starting_y = y
+        self.target_x_speed = 10
         self.x = x
         self.y = y
-        self.flap = 0
-        self.facing_right = True
         self.x_speed = random.randint(3, 10)
-        self.target_x_speed = 10
         self.y_speed = 0
-        self.walking = True
-        self.flap_count = 0
         self.spawning = True
-        self.alive = 2
-
-    @abc.abstractmethod
-    def die(self):
-        pass
-
-    @abc.abstractmethod
-    def respawn(self):
-        pass
-
-    @abc.abstractmethod
-    def update(self, current_time):
-        pass
+        self.walking = True
 
     def bounce(self, colliding_object):
         collided = False
@@ -68,6 +56,18 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
             self.y_speed = 0
 
         return collided
+
+    @abc.abstractmethod
+    def die(self):
+        pass
+
+    @abc.abstractmethod
+    def respawn(self):
+        pass
+
+    @abc.abstractmethod
+    def update(self, current_time):
+        pass
 
     def _handle_platform_collision(self):
         level = self.game.level

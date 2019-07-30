@@ -19,14 +19,13 @@ class Player(Rider):
         spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
         unmounted_images = sprite_loader.get_sliced_sprites(60, 60, "playerUnMounted.png")
         super().__init__(game, x, y, bird_images, spawn_images, unmounted_images)
+        self.action_keys = None
+        self.lives = 4
         self.frame_num = 2
         self.image = self.images[self.frame_num]
         self.rect = self.image.get_rect()
-        self.lives = 4
-        self.spawning = True
-        self.alive = 2
-        self.action_keys = None
         self.sound_mixer = game.sound_mixer
+        self.spawning = True
 
     def handle_input(self, action_keys):
         # TODO This needs to handle actions.
@@ -190,19 +189,19 @@ class Player(Rider):
                 bird.bounce(self)
 
     def die(self):
-        self.lives -= 1
         self.alive = 1
+        self.lives -= 1
 
     def respawn(self):
+        self.alive = 2
+        self.facing_right = True
+        self.flap = False
         self.frame_num = 1
         self.image = self.images[self.frame_num]
         self.rect = self.image.get_rect()
+        self.spawning = True
+        self.walking = True
         self.x = self.starting_x
         self.y = self.starting_y
-        self.facing_right = True
         self.x_speed = 0
         self.y_speed = 0
-        self.flap = False
-        self.walking = True
-        self.spawning = True
-        self.alive = 2

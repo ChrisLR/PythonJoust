@@ -18,12 +18,12 @@ class Enemy(Rider):
         super().__init__(game, x, y, enemy_images, spawn_images, unmounted_images)
 
     def die(self):
+        self.alive = 1
         # make an egg appear here
         egg = listing.get("Egg")(self.game, self.x, self.y)
         egg.x_speed = self.x_speed
         egg.y_speed = self.y_speed
         self.game.register_sprite(egg)
-        self.alive = 1
 
     def _update_mounted(self, current_time):
         if self.spawning:

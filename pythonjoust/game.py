@@ -13,8 +13,7 @@ class GodMode(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        self.pic = game.sprite_loader.get_image("god.png")
-        self.image = self.pic
+        self.image = game.sprite_loader.get_image("god.png")
         self.on = False
         self.rect = self.image.get_rect()
         self.rect.topleft = (850, 0)
@@ -38,15 +37,15 @@ class Game(object):
         self.screen = pygame.display.get_surface()
         self.clear_surface = self.screen.copy()
         self.sprite_loader = Spriteloader()
-        self.god_mode = GodMode(self)
+
         self.enemies = []
-        self.platforms = []
+        self.god_mode = GodMode(self)
+        self.hud = HUD(self)
+        self.level = None
         self.players = []
         self.render_updates = {}
-        self.level = None
-        self.hud = HUD(self)
-        self.score = 0
         self.running = False
+        self.score = 0
         self.sound_mixer = SoundMixer()
 
     @property
