@@ -13,9 +13,6 @@ class Player(Rider):
     name = "Player"
     update_cycle_time = 30
 
-    # TODO The Player should not be the one to handle sound
-    sound_folder = os.path.join("pythonjoust", "sounds")
-
     def __init__(self, game, x, y):
         sprite_loader = game.sprite_loader
         bird_images = sprite_loader.get_sliced_sprites(60, 60, "playerMounted.png")
@@ -25,14 +22,11 @@ class Player(Rider):
         self.frame_num = 2
         self.image = self.images[self.frame_num]
         self.rect = self.image.get_rect()
-        self.player_channel = pygame.mixer.Channel(0)
-        self.flap_sound = pygame.mixer.Sound(os.path.join(self.sound_folder, "joustflaedit.wav"))
-        self.skid_sound = pygame.mixer.Sound(os.path.join(self.sound_folder, "joustski.wav"))
-        self.bump_sound = pygame.mixer.Sound(os.path.join(self.sound_folder, "joustthu.wav"))
         self.lives = 4
         self.spawning = True
         self.alive = 2
         self.action_keys = None
+        self.sound_mixer = game.sound_mixer
 
     def handle_input(self, action_keys):
         # TODO This needs to handle actions.
@@ -61,8 +55,7 @@ class Player(Rider):
                     self.x_speed += 0.5
             if keymap.ActionKey.Flap in self.action_keys:
                 if not self.flap:
-                    self.player_channel.stop()
-                    self.flap_sound.play(0)
+                    self.sound_mixer.play_flap()
                     if self.y_speed > -250:
                         self.y_speed -= 3
                     flapping = True
@@ -84,7 +77,7 @@ class Player(Rider):
             collided = self._handle_platform_collision()
             if collided:
                 # play a bump sound
-                self.player_channel.play(self.bump_sound)
+                self.sound_mixer.play_bump()
             self.rect.topleft = (self.x, self.y)
             if self.walking:
                 # if walking
@@ -94,7 +87,7 @@ class Player(Rider):
                                 self.x_speed < -5 and walking_right):
 
                             if self.frame_num != 4:
-                                self.player_channel.play(self.skid_sound)
+                                self.sound_mixer.play_skid()
                             self.frame_num = 4
                         else:
                             self.next_anim_time = current_time + 200 / abs(self.x_speed)
@@ -103,7 +96,6 @@ class Player(Rider):
                                 self.frame_num = 0
                     elif self.frame_num == 4:
                         self.frame_num = 3
-                        self.player_channel.stop()
 
                 self.image = self.images[self.frame_num]
             else:
