@@ -15,6 +15,7 @@ class SoundMixer(object):
 
     def __init__(self):
         self.channel = pygame.mixer.Channel(1)
+        self.channel.set_volume(0.1)
         self.sound_names = [
             sound_name for sound_name in os.listdir(self.sound_folder)
             if sound_name.endswith(".wav")
@@ -28,7 +29,7 @@ class SoundMixer(object):
         self.channel.stop()
         sound = self.sounds.get(sound_name)
         if sound is not None:
-            sound.play(0)
+            self.channel.play(sound)
 
     def play_bump(self):
         # Convenience method
