@@ -1,7 +1,7 @@
 import pygame
 
 from pythonjoust.levels import BasicLevel
-from pythonjoust.joust import Game
+from pythonjoust.game import Game
 
 
 if __name__ == '__main__':
