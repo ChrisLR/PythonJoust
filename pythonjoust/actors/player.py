@@ -4,7 +4,7 @@ import pygame
 
 from pythonjoust import keymap
 from pythonjoust.actors import listing
-from pythonjoust.actors.base import Rider
+from pythonjoust.actors.base import Rider, RiderState
 
 
 @listing.register
@@ -172,27 +172,30 @@ class Player(Rider):
         )
         god_mode = self.game.god_mode
         for bird in colliding_birds:
+            if bird.state is not RiderState.Mounted:
+                continue
+
             # check each bird to see if above or below
-            if bird.y > self.y and bird.alive:
+            if bird.y > self.y:
                 self.bounce(bird)
                 bird.die()
                 bird.bounce(self)
-            elif bird.y < self.y - 5 and bird.alive and not god_mode.on:
+            elif bird.y < self.y - 5 and not god_mode.on:
                 self.bounce(bird)
                 bird.bounce(self)
                 self.die()
 
                 break
-            elif bird.alive:
+            elif bird.state:
                 self.bounce(bird)
                 bird.bounce(self)
 
     def die(self):
-        self.alive = 1
+        self.state = RiderState.Unmounted
         self.lives -= 1
 
     def respawn(self):
-        self.alive = 2
+        self.state = RiderState.Mounted
         self.facing_right = True
         self.flap = False
         self.frame_num = 1

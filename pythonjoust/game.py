@@ -64,6 +64,14 @@ class Game(object):
         if render_update is not None:
             render_update.remove(sprite)
 
+    def get_render_updates(self):
+        sorted_list = sorted(
+            self.render_updates.items(),
+            key=lambda element: element[0].render_priority,
+            reverse=True
+        )
+        return [render_update for key, render_update in sorted_list]
+
     def start(self, level):
         self.level = level
         player_spawn_point = level.get_player_spawn()
@@ -81,7 +89,7 @@ class Game(object):
             self.level.update(current_time)
             self._handle_input(current_time)
             draw_rects = []
-            render_updates = list(self.render_updates.values())
+            render_updates = self.get_render_updates()
             for render_update in render_updates:
                 render_update.update(current_time)
                 draw_rect = render_update.draw(self.screen)

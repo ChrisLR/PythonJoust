@@ -1,15 +1,17 @@
 import abc
 import random
+from enum import IntEnum
 
 import pygame
 
 
 class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
     name = ""
+    render_priority = 5
 
     def __init__(self, game, x, y, images, spawn_images, unmounted_images):
         super().__init__()
-        self.alive = 2
+        self.state = RiderState.Mounted
         self.facing_right = True
         self.flap = 0
         self.flap_count = 0
@@ -94,9 +96,9 @@ class Rider(Actor, metaclass=abc.ABCMeta):
     def update(self, current_time):
         if self.next_update_time < current_time:
             self.next_update_time = current_time + self.update_cycle_time
-            if self.alive == 2:
+            if self.state == 2:
                 self._update_mounted(current_time)
-            elif self.alive == 1:
+            elif self.state == 1:
                 self._update_unmounted(current_time)
             else:
                 self._update_dead(current_time)
@@ -119,21 +121,27 @@ class Rider(Actor, metaclass=abc.ABCMeta):
             self.y_speed = 2
         if self.y > 570:
             self.die()
-            self.alive = 0
+            self.state = RiderState.Dead
             self.next_update_time = current_time + 2000
             self.y = 800
             return
         if self.x < -48:
             if remove is True:
                 self.image = self.images[-1]
-                self.alive = 0
+                self.state = RiderState.Dead
                 self.next_update_time = current_time + 2000
             else:
                 self.x = 900
         if self.x > 900:
             if remove is True:
                 self.image = self.images[-1]
-                self.alive = 0
+                self.state = RiderState.Dead
                 self.next_update_time = current_time + 2000
             else:
                 self.x = -48
+
+
+class RiderState(IntEnum):
+    Dead = 0
+    Unmounted = 1
+    Mounted = 2

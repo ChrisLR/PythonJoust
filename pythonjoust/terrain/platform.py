@@ -2,6 +2,8 @@ import pygame
 
 
 class Platform(pygame.sprite.Sprite):
+    render_priority = 1
+
     def __init__(self, image, x, y):
         super().__init__()
         self.image = image

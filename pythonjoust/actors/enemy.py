@@ -3,7 +3,7 @@ import random
 import pygame
 
 from pythonjoust.actors import listing
-from pythonjoust.actors.base import Rider
+from pythonjoust.actors.base import Rider, RiderState
 
 
 @listing.register
@@ -18,7 +18,7 @@ class Enemy(Rider):
         super().__init__(game, x, y, enemy_images, spawn_images, unmounted_images)
 
     def die(self):
-        self.alive = 1
+        self.state = RiderState.Unmounted
         # make an egg appear here
         egg = listing.get("Egg")(self.game, self.x, self.y)
         egg.x_speed = self.x_speed
