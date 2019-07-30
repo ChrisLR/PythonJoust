@@ -1,5 +1,5 @@
-from actors import listing
-from actors.base import Actor
+from pythonjoust.actors import listing
+from pythonjoust.actors.base import Actor
 
 
 @listing.register

@@ -2,8 +2,8 @@ import random
 
 import pygame
 
-from actors import Enemy
-from terrain import Platform
+from pythonjoust.actors import Enemy
+from pythonjoust.terrain import Platform
 
 
 class BasicLevel(object):

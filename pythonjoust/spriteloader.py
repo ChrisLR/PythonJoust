@@ -4,11 +4,17 @@ import pygame
 
 
 class Spriteloader(object):
+    image_folder = os.path.join("pythonjoust", "images")
+
     def __init__(self):
-        self.image_names = [image_name for image_name in os.listdir("images")
-                            if image_name.endswith(".png")]
-        self.images = {image_name: pygame.image.load(os.path.join("images", image_name))
-                       for image_name in self.image_names}
+        self.image_names = [
+            image_name for image_name in os.listdir(self.image_folder)
+            if image_name.endswith(".png")
+        ]
+        self.images = {
+            image_name: pygame.image.load(os.path.join(self.image_folder, image_name))
+            for image_name in self.image_names
+        }
         self.cached_slices = {}
 
     def get_sliced_sprites(self, width, height, image_name):

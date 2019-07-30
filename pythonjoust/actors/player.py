@@ -3,15 +3,18 @@ import random
 
 import pygame
 
-import keymap
-from actors import listing
-from actors.base import Rider
+from pythonjoust import keymap
+from pythonjoust.actors import listing
+from pythonjoust.actors.base import Rider
 
 
 @listing.register
 class Player(Rider):
     name = "Player"
     update_cycle_time = 30
+
+    # TODO The Player should not be the one to handle sound
+    sound_folder = os.path.join("pythonjoust", "sounds")
 
     def __init__(self, game, x, y):
         sprite_loader = game.sprite_loader
@@ -23,9 +26,9 @@ class Player(Rider):
         self.image = self.images[self.frame_num]
         self.rect = self.image.get_rect()
         self.player_channel = pygame.mixer.Channel(0)
-        self.flap_sound = pygame.mixer.Sound(os.path.join("sounds", "joustflaedit.wav"))
-        self.skid_sound = pygame.mixer.Sound(os.path.join("sounds", "joustski.wav"))
-        self.bump_sound = pygame.mixer.Sound(os.path.join("sounds", "joustthu.wav"))
+        self.flap_sound = pygame.mixer.Sound(os.path.join(self.sound_folder, "joustflaedit.wav"))
+        self.skid_sound = pygame.mixer.Sound(os.path.join(self.sound_folder, "joustski.wav"))
+        self.bump_sound = pygame.mixer.Sound(os.path.join(self.sound_folder, "joustthu.wav"))
         self.lives = 4
         self.spawning = True
         self.alive = 2

@@ -2,8 +2,8 @@ import random
 
 import pygame
 
-from actors import listing
-from actors.base import Rider
+from pythonjoust.actors import listing
+from pythonjoust.actors.base import Rider
 
 
 @listing.register

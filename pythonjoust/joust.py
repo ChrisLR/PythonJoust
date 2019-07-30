@@ -2,10 +2,9 @@
 
 import pygame
 
-import keymap
-from actors import Player
-from levels import BasicLevel
-from spriteloader import Spriteloader
+from pythonjoust import keymap
+from pythonjoust.actors import Player
+from pythonjoust.spriteloader import Spriteloader
 
 
 class GodMode(pygame.sprite.Sprite):
@@ -143,12 +142,3 @@ class Game(object):
             if all_keys[key]
         }
         self.players[0].handle_input(player_one_actions)
-
-
-if __name__ == '__main__':
-    pygame.mixer.pre_init(44100, -16, 2, 512)
-    pygame.init()
-    game = Game()
-    starting_level = BasicLevel(game)
-    game.start(starting_level)
-    pygame.quit()
