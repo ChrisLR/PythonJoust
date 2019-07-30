@@ -11,6 +11,7 @@ from spriteloader import Spriteloader
 class GodMode(pygame.sprite.Sprite):
     def __init__(self, game):
         super().__init__()
+        self.game = game
         self.pic = game.sprite_loader.get_image("god.png")
         self.image = self.pic
         self.on = False
@@ -19,8 +20,13 @@ class GodMode(pygame.sprite.Sprite):
         self.timer = pygame.time.get_ticks()
 
     def toggle(self, current_time):
-        if current_time > self.timer:
-            self.on = not self.on
+        if current_time >= self.timer:
+            if self.on is True:
+                self.on = False
+                self.game.unregister_sprite(self)
+            else:
+                self.on = True
+                self.game.register_sprite(self)
             self.timer = current_time + 1000
 
 
@@ -82,9 +88,13 @@ class Game(object):
         )
         render_update.add(sprite)
 
+    def unregister_sprite(self, sprite):
+        render_update = self.render_updates.get(type(sprite))
+        if render_update is not None:
+            render_update.remove(sprite)
+
     def start(self, level):
         self.level = level
-        self.register_sprite(self.god_mode)
         player_spawn_point = level.get_player_spawn()
         player = Player(self, *player_spawn_point)
         self.players.append(player)
