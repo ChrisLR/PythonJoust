@@ -7,6 +7,11 @@ from pythonjoust.actors import listing
 from pythonjoust.actors.base import Rider, RiderState
 
 
+# TODO Could be in game rules instead
+EGGS_DESTROY_MAX_POINTS = 1000
+EGGS_DESTROY_INCREMENT_POINTS = 250
+
+
 @listing.register
 class Player(Rider):
     name = "Player"
@@ -76,6 +81,7 @@ class Player(Rider):
             self._handle_out_of_bounds(current_time)
             self.rect.topleft = (self.x, self.y)
             self._handle_bird_collisions()
+            self._handle_egg_collisions()
             # check for platform collision
             collided = self._handle_platform_collision()
             if collided:
@@ -185,6 +191,7 @@ class Player(Rider):
                 self.bounce(bird)
                 bird.die()
                 bird.bounce(self)
+                self.score += bird.score_value
             elif bird.y < self.y - 5 and not god_mode.on:
                 self.bounce(bird)
                 bird.bounce(self)
@@ -194,6 +201,19 @@ class Player(Rider):
             elif bird.state:
                 self.bounce(bird)
                 bird.bounce(self)
+
+    def _handle_egg_collisions(self):
+        # check for enemy collision
+        colliding_eggs = pygame.sprite.spritecollide(
+            self, self.game.level.eggs, False,
+            collided=pygame.sprite.collide_mask
+        )
+        for egg in colliding_eggs:
+            egg.die()
+            self.eggs_killed += 1
+            points = self.eggs_killed * EGGS_DESTROY_INCREMENT_POINTS
+            points = EGGS_DESTROY_MAX_POINTS if points > EGGS_DESTROY_MAX_POINTS else points
+            self.score += points
 
     def die(self):
         self.state = RiderState.Unmounted

@@ -16,6 +16,7 @@ class Enemy(Rider):
         spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
         unmounted_images = sprite_loader.get_sliced_sprites(60, 60, "unmounted.png")
         super().__init__(game, x, y, enemy_images, spawn_images, unmounted_images)
+        self.score_value = 500
 
     def die(self):
         self.state = RiderState.Unmounted
@@ -24,6 +25,7 @@ class Enemy(Rider):
         egg.x_speed = self.x_speed
         egg.y_speed = self.y_speed
         self.game.register_sprite(egg)
+        self.game.level.eggs.append(egg)
 
     def _update_mounted(self, current_time):
         if self.spawning:
@@ -57,7 +59,7 @@ class Enemy(Rider):
             self.x_speed += self.x_speed / abs(self.x_speed) / 2
         # work out if flapping...
         if self.flap < 1:
-            if (random.randint(0, 10) > 8 or self.y > 450):  # flap to avoid lava
+            if random.randint(0, 10) > 8 or self.y > 450:  # flap to avoid lava
                 self.y_speed -= 3
                 self.flap = 3
         else:

@@ -13,6 +13,7 @@ class Egg(Actor):
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.next_update_time = 0
+        self.lifetime = 0
 
     def move(self):
         # gravity
@@ -23,8 +24,14 @@ class Egg(Actor):
             self.y += self.y_speed
 
         self.x += self.x_speed
+        if self.x_speed and self.walking:
+            # Slow down gradually
+            self.x_speed += -0.01 if self.x_speed > 0 else 0.01
+            if abs(self.x_speed) < 0.01:
+                self.x_speed = 0
+
         if self.y > 570:  # hit lava
-            self.kill()
+            self.die()
 
     def update(self, current_time):
         # Update every 30 milliseconds
@@ -33,6 +40,10 @@ class Egg(Actor):
             self.move()
             self.rect.topleft = (self.x, self.y)
             self._handle_platform_collision()
+            self.lifetime += 1
+
+            if self.lifetime >= 60000:
+                self.hatch()
 
             # wrap round screens
             if self.x < -48:
@@ -41,7 +52,11 @@ class Egg(Actor):
                 self.x = 0
 
     def die(self):
-        pass
+        self.game.level.eggs.remove(self)
+        self.kill()
 
     def respawn(self):
+        pass
+
+    def hatch(self):
         pass

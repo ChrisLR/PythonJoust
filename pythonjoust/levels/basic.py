@@ -33,6 +33,7 @@ class BasicLevel(object):
             (415, 350),
         ]
         self.next_spawn_time = 0
+        self.eggs = []
 
     def clear(self):
         pass

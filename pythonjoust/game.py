@@ -6,7 +6,7 @@ from pythonjoust import keymap
 from pythonjoust.actors import Player
 from pythonjoust.hud import HUD
 from pythonjoust.spriteloader import Spriteloader
-from pythonjoust.soundmixer import SoundMixer
+from pythonjoust.soundmixer import SoundMixer, SilentMixer
 
 
 class GodMode(pygame.sprite.Sprite):
@@ -49,16 +49,6 @@ class Game(object):
         self.score_2 = 0
         self.sound_mixer = SoundMixer()
         self.two_players = False
-
-    @property
-    def lives(self):
-        return self.players[0].lives
-
-    @property
-    def lives_2(self):
-        if self.two_players:
-            return self.players[1].lives
-        return 0
 
     def register_sprite(self, sprite):
         render_update = self.render_updates.setdefault(
