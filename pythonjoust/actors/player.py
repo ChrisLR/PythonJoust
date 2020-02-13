@@ -28,6 +28,8 @@ class Player(Rider):
         self.rect = self.image.get_rect()
         self.sound_mixer = game.sound_mixer
         self.spawning = True
+        self.score = 0
+        self.eggs_killed = 0
 
     def handle_input(self, action_keys):
         # TODO This needs to handle actions.
