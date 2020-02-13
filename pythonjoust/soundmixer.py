@@ -9,6 +9,15 @@ class SilentMixer(object):
     def play(self, sound_name):
         pass
 
+    def play_bump(self):
+        pass
+
+    def play_flap(self):
+        pass
+
+    def play_skid(self):
+        pass
+
 
 class SoundMixer(object):
     sound_folder = os.path.join("pythonjoust", "sounds")
