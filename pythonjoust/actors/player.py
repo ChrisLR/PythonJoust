@@ -12,13 +12,16 @@ class Player(Rider):
     name = "Player"
     update_cycle_time = 30
 
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, player_two=False):
         sprite_loader = game.sprite_loader
-        bird_images = sprite_loader.get_sliced_sprites(60, 60, "playerMounted.png")
+        if player_two:
+            bird_images = sprite_loader.get_sliced_sprites(60, 60, "player2Mounted.png")
+        else:
+            bird_images = sprite_loader.get_sliced_sprites(60, 60, "playerMounted.png")
         spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
         unmounted_images = sprite_loader.get_sliced_sprites(60, 60, "playerUnMounted.png")
         super().__init__(game, x, y, bird_images, spawn_images, unmounted_images)
-        self.action_keys = None
+        self.action_keys = set()
         self.lives = 4
         self.frame_num = 2
         self.image = self.images[self.frame_num]

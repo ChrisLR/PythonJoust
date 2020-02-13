@@ -46,11 +46,19 @@ class Game(object):
         self.render_updates = {}
         self.running = False
         self.score = 0
+        self.score_2 = 0
         self.sound_mixer = SoundMixer()
+        self.two_players = False
 
     @property
     def lives(self):
         return self.players[0].lives
+
+    @property
+    def lives_2(self):
+        if self.two_players:
+            return self.players[1].lives
+        return 0
 
     def register_sprite(self, sprite):
         render_update = self.render_updates.setdefault(
@@ -74,13 +82,22 @@ class Game(object):
 
     def start(self, level):
         self.level = level
-        player_spawn_point = level.get_player_spawn()
-        player = Player(self, *player_spawn_point)
-        self.players.append(player)
-        self.register_sprite(player)
+        self.add_player()
         level.prepare()
         pygame.display.update()
         self._run()
+
+    def add_player(self):
+        amount_players = len(self.players)
+        if amount_players == 1:
+            self.two_players = True
+        elif amount_players >= 2:
+            return
+
+        player_spawn_point = self.level.get_player_spawn()
+        player = Player(self, *player_spawn_point, player_two=self.two_players)
+        self.players.append(player)
+        self.register_sprite(player)
 
     def _run(self):
         self.running = True
@@ -115,13 +132,23 @@ class Game(object):
         if keymap.ActionKey.GameExit in global_actions:
             self.running = False
 
+        if keymap.ActionKey.AddPlayerTwo in global_actions:
+            self.add_player()
+
         # check for God mode toggle
         if keymap.ActionKey.GodMode in global_actions:
             self.god_mode.toggle(current_time)
 
-        # TODO Support more than one player
+        # TODO Improve the copy pasta
         player_one_actions = {
             action for key, action in keymap.player_one.items()
             if all_keys[key]
         }
         self.players[0].handle_input(player_one_actions)
+
+        if self.two_players:
+            player_two_actions = {
+                action for key, action in keymap.player_two.items()
+                if all_keys[key]
+            }
+            self.players[1].handle_input(player_two_actions)
