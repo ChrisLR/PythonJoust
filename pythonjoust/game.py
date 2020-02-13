@@ -45,8 +45,6 @@ class Game(object):
         self.players = []
         self.render_updates = {}
         self.running = False
-        self.score = 0
-        self.score_2 = 0
         self.sound_mixer = SoundMixer()
         self.two_players = False
 
