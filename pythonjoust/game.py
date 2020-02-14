@@ -1,15 +1,19 @@
 # Original Joust Code by S Paget
 
+import random
+
 import pygame
 
 from pythonjoust import keymap
-from pythonjoust.actors import Player
+from pythonjoust.actors import Player, listing
 from pythonjoust.hud import HUD
+from pythonjoust.soundmixer import SilentMixer
 from pythonjoust.spriteloader import Spriteloader
-from pythonjoust.soundmixer import SoundMixer, SilentMixer
 
 
 class GodMode(pygame.sprite.Sprite):
+    render_priority = 1
+
     def __init__(self, game):
         super().__init__()
         self.game = game
@@ -45,8 +49,10 @@ class Game(object):
         self.players = []
         self.render_updates = {}
         self.running = False
-        self.sound_mixer = SoundMixer()
+        self.sound_mixer = SilentMixer()
+        # self.sound_mixer = SoundMixer()
         self.two_players = False
+        self.previous_global_actions = set()
 
     def register_sprite(self, sprite):
         render_update = self.render_updates.setdefault(
@@ -87,6 +93,12 @@ class Game(object):
         self.players.append(player)
         self.register_sprite(player)
 
+    def spawn_random_egg(self):
+        spawn_point = random.choice(self.level.enemy_spawn_points)
+        egg = listing.get("Egg")(self, *spawn_point)
+        self.level.eggs.append(egg)
+        self.register_sprite(egg)
+
     def _run(self):
         self.running = True
         while self.running:
@@ -123,6 +135,10 @@ class Game(object):
         if keymap.ActionKey.AddPlayerTwo in global_actions:
             self.add_player()
 
+        spawn_egg = keymap.ActionKey.SpawnEgg
+        if spawn_egg in global_actions and spawn_egg not in self.previous_global_actions:
+            self.spawn_random_egg()
+
         # check for God mode toggle
         if keymap.ActionKey.GodMode in global_actions:
             self.god_mode.toggle(current_time)
@@ -140,3 +156,5 @@ class Game(object):
                 if all_keys[key]
             }
             self.players[1].handle_input(player_two_actions)
+
+        self.previous_global_actions = global_actions
