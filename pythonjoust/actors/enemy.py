@@ -26,6 +26,7 @@ class Enemy(Rider):
         egg.y_speed = self.y_speed
         self.game.register_sprite(egg)
         self.game.level.eggs.append(egg)
+        self.game.level.enemies.remove(self)
 
     def _update_mounted(self, current_time):
         if self.spawning:
