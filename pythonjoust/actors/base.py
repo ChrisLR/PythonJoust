@@ -78,7 +78,7 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
             collided=pygame.sprite.collide_mask
         )
         collided = False
-        if (((self.y > 40 and self.y < 45) or (self.y > 250 and self.y < 255)) and (
+        if (((40 < self.y < 45) or (250 < self.y < 255)) and (
                 self.x < 0 or self.x > 860)):  # catch when it is rolling between screens
             self.y_speed = 0
             self.walking = True
