@@ -2,10 +2,9 @@ import random
 
 import pygame
 
-from pythonjoust import keymap
 from pythonjoust.actors import listing
 from pythonjoust.actors.base import Rider, RiderState
-
+from pythonjoust.input import keymap
 
 # TODO Could be in game rules instead
 EGGS_DESTROY_MAX_POINTS = 1000
@@ -17,14 +16,19 @@ class Player(Rider):
     name = "Player"
     update_cycle_time = 30
 
-    def __init__(self, game, x, y, player_two=False):
+    def __init__(self, game, x, y, controller_input, player_number=1):
         sprite_loader = game.sprite_loader
-        if player_two:
-            bird_images = sprite_loader.get_sliced_sprites(60, 60, "player2Mounted.png")
-        else:
-            bird_images = sprite_loader.get_sliced_sprites(60, 60, "playerMounted.png")
+        # TODO This way of setting the sprite needs to be improved
+        try:
+            bird_images = sprite_loader.get_sliced_sprites(60, 60, f"player{player_number}Mounted.png")
+            unmounted_images = sprite_loader.get_sliced_sprites(60, 60, f"player{player_number}UnMounted.png")
+        except AttributeError:
+            # We try to grab the newest player's specific image file but fallback to the first player.
+            bird_images = sprite_loader.get_sliced_sprites(60, 60, f"player1Mounted.png")
+            unmounted_images = sprite_loader.get_sliced_sprites(60, 60, f"player1UnMounted.png")
+
         spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
-        unmounted_images = sprite_loader.get_sliced_sprites(60, 60, "playerUnMounted.png")
+
         super().__init__(game, x, y, bird_images, spawn_images, unmounted_images)
         self.action_keys = set()
         self.lives = 4
@@ -35,10 +39,12 @@ class Player(Rider):
         self.spawning = True
         self.score = 0
         self.eggs_killed = 0
+        self.controller_input = controller_input
 
-    def handle_input(self, action_keys):
-        # TODO This needs to handle actions.
-        self.action_keys = action_keys
+    def handle_input(self, keyboard_keys):
+        # TODO Actions should be called from here
+        self.controller_input.handle_keyboard_keys(keyboard_keys)
+        self.action_keys = self.controller_input.get_keymaps()
 
     def _update_mounted(self, current_time):
         if self.spawning:

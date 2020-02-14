@@ -4,7 +4,7 @@ import random
 
 import pygame
 
-from pythonjoust import keymap
+from pythonjoust.input import ActionKey, initialize_joysticks, keymap, Keyboard, KeyboardMapping, Joystick, JoystickMapping
 from pythonjoust.actors import Player, listing
 from pythonjoust.hud import HUD
 from pythonjoust.soundmixer import SilentMixer
@@ -51,8 +51,21 @@ class Game(object):
         self.running = False
         self.sound_mixer = SilentMixer()
         # self.sound_mixer = SoundMixer()
-        self.two_players = False
         self.previous_global_actions = set()
+        self.joysticks = [
+            Joystick(joystick, JoystickMapping.default())
+            for joystick in initialize_joysticks()
+        ]
+        self.keyboards = [
+            Keyboard(KeyboardMapping.default()),
+            Keyboard(KeyboardMapping.alternate())
+        ]
+
+        # TODO This needs to be option based, not hardcoded
+        all_inputs = []
+        all_inputs.extend(self.joysticks)
+        all_inputs.extend(self.keyboards)
+        self.available_inputs = (i for i in all_inputs)
 
     def register_sprite(self, sprite):
         render_update = self.render_updates.setdefault(
@@ -82,20 +95,25 @@ class Game(object):
         self._run()
 
     def add_player(self):
-        amount_players = len(self.players)
-        if amount_players == 1:
-            self.two_players = True
-        elif amount_players >= 2:
+        controller_input = next(self.available_inputs, None)
+        if controller_input is None:
+            # DEBUG!
+            # controller_input = self.keyboards[0]
             return
 
         player_spawn_point = self.level.get_player_spawn()
-        player = Player(self, *player_spawn_point, player_two=self.two_players)
+        player = Player(
+            self, *player_spawn_point,
+            controller_input=controller_input,
+            player_number=len(self.players) + 1
+        )
         self.players.append(player)
         self.register_sprite(player)
 
     def spawn_random_egg(self):
         spawn_point = random.choice(self.level.enemy_spawn_points)
         egg = listing.get("Egg")(self, *spawn_point)
+        egg.x_speed = random.randint(-25, 25)
         self.level.eggs.append(egg)
         self.register_sprite(egg)
 
@@ -129,32 +147,23 @@ class Game(object):
             if all_keys[key]
         }
         # If they have pressed Escape, close down Pygame
-        if keymap.ActionKey.GameExit in global_actions:
+        if ActionKey.GameExit in global_actions:
             self.running = False
 
-        if keymap.ActionKey.AddPlayerTwo in global_actions:
+        add_player = ActionKey.AddPlayer
+        if add_player in global_actions and add_player not in self.previous_global_actions:
             self.add_player()
 
-        spawn_egg = keymap.ActionKey.SpawnEgg
+        spawn_egg = ActionKey.SpawnEgg
         if spawn_egg in global_actions and spawn_egg not in self.previous_global_actions:
             self.spawn_random_egg()
 
         # check for God mode toggle
-        if keymap.ActionKey.GodMode in global_actions:
+        if ActionKey.GodMode in global_actions:
             self.god_mode.toggle(current_time)
 
-        # TODO Improve the copy pasta
-        player_one_actions = {
-            action for key, action in keymap.player_one.items()
-            if all_keys[key]
-        }
-        self.players[0].handle_input(player_one_actions)
+        for player in self.players:
+            player.handle_input(all_keys)
 
-        if self.two_players:
-            player_two_actions = {
-                action for key, action in keymap.player_two.items()
-                if all_keys[key]
-            }
-            self.players[1].handle_input(player_two_actions)
-
+        # TODO This can be improved
         self.previous_global_actions = global_actions

@@ -9,14 +9,14 @@ class ActionKey(IntEnum):
     Left = 2
     Right = 3
     Flap = 4
-    AddPlayerTwo = 5
+    AddPlayer = 5
     SpawnEgg = 6
 
 
 global_keys = {
     pygame.K_ESCAPE: ActionKey.GameExit,
     pygame.K_g: ActionKey.GodMode,
-    pygame.K_F2: ActionKey.AddPlayerTwo,
+    pygame.K_F2: ActionKey.AddPlayer,
     pygame.K_F3: ActionKey.SpawnEgg,
 }
 
