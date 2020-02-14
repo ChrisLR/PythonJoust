@@ -35,12 +35,13 @@ class GodMode(pygame.sprite.Sprite):
 
 
 class Game(object):
-    def __init__(self):
+    def __init__(self, options):
+        self.options = options
         self.window = pygame.display.set_mode((900, 650))
         pygame.display.set_caption('Joust')
         self.screen = pygame.display.get_surface()
         self.clear_surface = self.screen.copy()
-        self.sprite_loader = Spriteloader()
+        self.sprite_loader = Spriteloader(self)
 
         self.enemies = []
         self.god_mode = GodMode(self)

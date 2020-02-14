@@ -1,4 +1,4 @@
-from random import randint
+import random
 
 from pythonjoust.actors import listing
 from pythonjoust.actors.base import Actor
@@ -20,6 +20,7 @@ class Egg(Actor):
         self._is_hatching = False
         self._hatch_cumulated_time = 0
         self.hatched = False
+        self.broken = False
 
     def move(self):
         # gravity
@@ -63,6 +64,7 @@ class Egg(Actor):
     def die(self):
         self.game.level.eggs.remove(self)
         self.kill()
+        self.broken = True
 
     def respawn(self):
         pass
@@ -79,6 +81,7 @@ class Egg(Actor):
                 self.hatched = True
                 self._is_hatching = False
                 # TODO Spawn the buzzard off screen
-                buzzard = listing.get("Buzzard")(self.game, x=randint(0, 900), y=self.y, target_object=self)
+                x_choices = [0, 900]
+                buzzard = listing.get("Buzzard")(self.game, x=random.choice(x_choices), y=self.y, target_object=self)
                 self.game.level.enemies.append(buzzard)
                 self.game.register_sprite(buzzard)

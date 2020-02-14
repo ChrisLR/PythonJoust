@@ -113,7 +113,7 @@ class Buzzard(Enemy):
         self._handle_platform_collision()
         self._accelerate_or_flap(current_time)
         self._handle_egg_collisions()
-        self._handle_out_of_bounds(current_time)
+        self._handle_out_of_bounds(current_time, self.target_object.broken)
         self.image = self.unmounted_images[self.frame_num]
         self._flip_for_direction()
 

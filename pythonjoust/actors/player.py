@@ -20,14 +20,14 @@ class Player(Rider):
         sprite_loader = game.sprite_loader
         # TODO This way of setting the sprite needs to be improved
         try:
-            bird_images = sprite_loader.get_sliced_sprites(60, 60, f"player{player_number}Mounted.png")
-            unmounted_images = sprite_loader.get_sliced_sprites(60, 60, f"player{player_number}UnMounted.png")
+            bird_images = sprite_loader.get_autosized_sliced_sprites(f"player{player_number}Mounted.png", 8)
+            unmounted_images = sprite_loader.get_autosized_sliced_sprites(f"player{player_number}UnMounted.png", 8)
+            spawn_images = sprite_loader.get_sliced_sprites(60, 60, f"spawnPlayer{player_number}.png")
         except AttributeError:
             # We try to grab the newest player's specific image file but fallback to the first player.
             bird_images = sprite_loader.get_sliced_sprites(60, 60, f"player1Mounted.png")
             unmounted_images = sprite_loader.get_sliced_sprites(60, 60, f"player1UnMounted.png")
-
-        spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawn1.png")
+            spawn_images = sprite_loader.get_sliced_sprites(60, 60, "spawnPlayer1.png")
 
         super().__init__(game, x, y, bird_images, spawn_images, unmounted_images)
         self.action_keys = set()
