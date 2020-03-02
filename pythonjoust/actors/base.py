@@ -73,11 +73,15 @@ class Actor(pygame.sprite.Sprite, metaclass=abc.ABCMeta):
 
     def _handle_platform_collision(self):
         level = self.game.level
+        collidable_terrain = []
+        collidable_terrain.extend(level.platforms)
+        collidable_terrain.extend(level.bridges)
         collided_platforms = pygame.sprite.spritecollide(
-            self, level.platforms, False,
+            self, collidable_terrain, False,
             collided=pygame.sprite.collide_mask
         )
         collided = False
+
         if (((40 < self.y < 45) or (250 < self.y < 255)) and (
                 self.x < 0 or self.x > 860)):  # catch when it is rolling between screens
             self.y_speed = 0

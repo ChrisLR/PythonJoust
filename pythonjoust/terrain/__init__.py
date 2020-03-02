@@ -1,1 +1,1 @@
-from pythonjoust.terrain.platform import Platform
+from pythonjoust.terrain.platform import Platform, Bridge

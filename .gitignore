@@ -4,3 +4,4 @@ venv
 /actors/__pycache__/*.pyc
 *.pyc
 pythonjoust/alt_images/*.png
+config.ini
