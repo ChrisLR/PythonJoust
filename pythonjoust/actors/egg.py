@@ -33,7 +33,7 @@ class Egg(Actor):
         self.x += self.x_speed
         if self.x_speed and self.walking:
             # Slow down gradually
-            self.x_speed += -0.01 if self.x_speed > 0 else 0.01
+            self.x_speed += -0.1 if self.x_speed > 0 else 0.1
             if abs(self.x_speed) < 0.01:
                 self.x_speed = 0
 

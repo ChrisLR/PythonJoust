@@ -1,9 +1,10 @@
 import random
 
 import pygame
+from pygame.rect import Rect
 
 from pythonjoust.actors import Enemy
-from pythonjoust.terrain import Platform
+from pythonjoust.terrain import Platform, Bridge
 
 
 class BasicLevel(object):
@@ -18,7 +19,15 @@ class BasicLevel(object):
             [0, 600, 900, 50],
             [0, 620, 900, 30],
         ]
+        self.bridge_rectangles = [
+            (0, 550, 200, 10),
+            (750, 550, 200, 10)
+        ]
         sprite_loader = game.sprite_loader
+        self.bridges = [
+            Bridge(sprite_loader.get_image("bridge.png"), Rect(*self.bridge_rectangles[0])),
+            Bridge(sprite_loader.get_image("bridge.png"), Rect(*self.bridge_rectangles[1])),
+        ]
         self.platforms = [
             Platform(sprite_loader.get_image("plat1.png"), 200, 550),
             Platform(sprite_loader.get_image("plat2.png"), 350, 395),
@@ -51,6 +60,9 @@ class BasicLevel(object):
     def prepare(self):
         for platform in self.platforms:
             self.game.register_sprite(platform)
+
+        for bridge in self.bridges:
+            self.game.register_sprite(bridge)
         self.spawn_enemies()
         self.next_spawn_time = pygame.time.get_ticks() + 2000
 

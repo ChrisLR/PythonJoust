@@ -114,7 +114,7 @@ class Game(object):
     def spawn_random_egg(self):
         spawn_point = random.choice(self.level.enemy_spawn_points)
         egg = listing.get("Egg")(self, *spawn_point)
-        egg.x_speed = random.randint(-25, 25)
+        egg.x_speed = random.randint(-10, 10)
         self.level.eggs.append(egg)
         self.register_sprite(egg)
 
